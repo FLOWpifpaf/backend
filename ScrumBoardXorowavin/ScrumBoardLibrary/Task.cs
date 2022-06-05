@@ -1,12 +1,15 @@
-﻿namespace ScrumBoardLibrary;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ScrumBoardLibrary;
 
 public class Task : ITask
 {
-    public int Id { get; set; }
+    [Key] public int Id { get; set; }
 
     public string Name { get; set; }
     public string Description { get; set; }
     public int Priority { get; set; }
+    public Column Column { get; set; }
 
     public Task(int id, string name, string description, int priority)
     {

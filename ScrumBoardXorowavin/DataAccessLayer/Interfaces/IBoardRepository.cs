@@ -4,8 +4,8 @@ namespace DataAccessLayer.Repositories;
 
 public interface IBoardRepository
 {
-    List<IBoard> GetAllBoards();
-    IBoard Get(int id);
+    List<Board> GetAllBoards();
+    Board Get(int id);
     void Create(int id, string name);
     void Remove(int id);
 }

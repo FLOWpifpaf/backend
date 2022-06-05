@@ -48,7 +48,7 @@ namespace ScrumBoardTests
         {
             IColumn column = new Column(1,"Column name");
 
-            Assert.Equal("Column name", column.ColumnName);
+            Assert.Equal("Column name", column.Name);
         }
 
         [Fact]
@@ -70,7 +70,7 @@ namespace ScrumBoardTests
 
             column.ChangeName("Column name");
 
-            Assert.Equal("Column name", column.ColumnName);
+            Assert.Equal("Column name", column.Name);
         }
 
         [Fact]

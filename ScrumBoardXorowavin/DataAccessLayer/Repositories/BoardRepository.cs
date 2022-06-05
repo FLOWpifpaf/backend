@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using ScrumBoardLibrary;
 
@@ -5,46 +6,41 @@ namespace DataAccessLayer.Repositories;
 
 public class BoardRepository : IBoardRepository
 {
-    private readonly IMemoryCache _memoryCache;
+    private readonly DbContext _db;
 
-    public BoardRepository(IMemoryCache memoryCache)
+    public BoardRepository(DbContext db)
     {
-        _memoryCache = memoryCache;
+        _db = db;
     }
 
-    public List<IBoard> GetAllBoards()
+    public List<Board> GetAllBoards()
     {
-        _memoryCache.TryGetValue("boards", out List<IBoard> boards);
+        var boards = _db.Boards.ToList();
+        
+        if (boards is null) boards = new List<Board>();
         return boards;
     }
 
-    public IBoard Get(int id)
+    public Board Get(int id)
     {
         return GetAllBoards().Find(b => b.Id == id);
     }
 
     public void Create(int id, string name)
     {
-        var boards = GetAllBoards();
-
-        if (boards is null) boards = new List<IBoard>();
-
+        var boards = _db.Boards;
+        
         var board = new Board(id, name);
         boards.Add(board);
 
-        _memoryCache.Set("boards", boards);
+        _db.SaveChanges();
     }
 
     public void Remove(int id)
     {
-        var boards = GetAllBoards();
-        for (int i = 0; i < boards.Count; i++)
-            if (boards[i].Id == id)
-            {
-                boards.RemoveAt(i);
-                break;
-            }
-
-        _memoryCache.Set("boards", boards);
+        var boards = _db.Boards;
+        var board = Get(id);
+        boards.Remove(board);
+        _db.SaveChanges();
     }
 }

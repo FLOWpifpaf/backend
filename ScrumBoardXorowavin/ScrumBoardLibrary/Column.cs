@@ -1,47 +1,51 @@
-﻿namespace ScrumBoardLibrary;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ScrumBoardLibrary;
 
 public class Column : IColumn
 {
-    public int Id { get; set; }
+    [Key]  public int Id { get; set; }
 
-    public string ColumnName { get; set; }
-    private List<ITask> _tasks;
+    public string Name { get; set; }
+    public List<Task> Tasks { get; set; }
+    public Board Board { get; set; }
 
     public Column(int id, string name)
     {
-        this.Id = id;
-        ColumnName = name;
-        _tasks = new List<ITask>();
+        Id = id;
+        Name = name;
+        Tasks = new List<Task>();
     }
 
     public void ChangeName(string name)
     {
-        ColumnName = name;
+        Name = name;
     }
 
-    public void AddTask(ITask task)
+    public void AddTask(Task task)
     {
-        _tasks.Add(task);
+        Tasks.Add(task);
+        task.Column = this;
     }
 
-    public ITask GetTask(string name)
+    public Task GetTask(string name)
     {
-        return _tasks.Find(x => x.Name == name);
+        return Tasks.Find(x => x.Name == name);
     }
 
-    public List<ITask> GetAllTasks()
+    public List<Task> GetAllTasks()
     {
-        return _tasks;
+        return Tasks;
     }
 
-    public void DeleteTask(ITask task)
+    public void DeleteTask(Task task)
     {
-        _tasks.Remove(task);
+        Tasks.Remove(task);
     }
 
     public void Clear()
     {
-        _tasks.Clear();
+        Tasks.Clear();
     }
 
 }

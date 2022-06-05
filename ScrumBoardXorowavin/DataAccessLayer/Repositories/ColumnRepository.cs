@@ -5,49 +5,42 @@ namespace DataAccessLayer.Repositories;
 
 public class ColumnRepository : IColumnRepository
 {
-    private readonly IMemoryCache _memoryCache;
+    private readonly DbContext _db;
     private readonly IBoardRepository _boardRepository;
 
-    public ColumnRepository(IMemoryCache memoryCache, IBoardRepository boardRepository)
+    public ColumnRepository(DbContext db, IBoardRepository boardRepository)
     {
-        _memoryCache = memoryCache;
+        _db = db;
         _boardRepository = boardRepository;
     }
 
-    public List<IColumn> GetAllColumns()
+    public List<Column> GetAllColumns()
     {
-        _memoryCache.TryGetValue("columns", out List<IColumn> columns);
+        var columns = _db.Columns.ToList();
         return columns;
     }
 
-    public IColumn Get(int id)
+    public Column Get(int id)
     {
         return GetAllColumns().Find(c => c.Id == id);
     }
 
-    public void Create(int id, string name)
+    public void Create(int boardId, int id, string name)
     {
-        var columns = GetAllColumns();
-
-        if (columns is null) columns = new List<IColumn>();
-
+        var columns = _db.Columns;
+        var board = _boardRepository.Get(boardId);
         var col = new Column(id, name);
         columns.Add(col);
-
-        _memoryCache.Set("columns", columns);
+        board.AddColumn(col);
+        _db.SaveChanges();
     }
 
     public void Remove(int id)
     {
-        var columns = GetAllColumns();
-        for (int i = 0; i < columns.Count; i++)
-            if (columns[i].Id == id)
-            {
-                columns.RemoveAt(i);
-                break;
-            }
-
-        foreach (var board in _boardRepository.GetAllBoards())
+        var columns = _db.Columns;
+        columns.Remove( Get(id));
+        
+        foreach (var board in _db.Boards)
         {
             var col = board.Columns.Find(c => c.Id == id);
             if (col != null)
@@ -57,19 +50,20 @@ public class ColumnRepository : IColumnRepository
             }
         }
 
-
-        _memoryCache.Set("columns", columns);
+        _db.SaveChanges();
     }
 
     public void Update(int id, string newName)
     {
-        Get(id).ColumnName = newName;
+        Get(id).Name = newName;
 
-        foreach (var board in _boardRepository.GetAllBoards())
+        foreach (var board in _db.Boards)
         {
             var col = board.Columns.Find(c => c.Id == id);
             if (col is not null)
-                col.ColumnName = newName;
+                col.Name = newName;
         }
+
+        _db.SaveChanges();
     }
 }

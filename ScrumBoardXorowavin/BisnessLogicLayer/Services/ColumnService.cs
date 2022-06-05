@@ -21,9 +21,9 @@ public class ColumnService : IColumnService
         return columnsDto;
     }
 
-    public void CreateColumn(int id, string name)
+    public void CreateColumn(int boardId, int id, string name)
     {
-        this._repository.Create(id, name);
+        this._repository.Create(boardId, id, name);
     }
 
     public void UpdateColumn(int id, string newName)

@@ -1,11 +1,13 @@
-﻿namespace ScrumBoardLibrary;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class Board : IBoard
+namespace ScrumBoardLibrary;
+
+public class Board
 {
     int MAX = 10;
 
-    public int Id { get; set; }
-    public List<IColumn> Columns { get; set; }
+    [Key] public int Id { get; set; }
+    public List<Column> Columns { get; set; }
 
     public string Name { get; set; }
 
@@ -13,25 +15,37 @@ public class Board : IBoard
     {
         this.Id = id;
         Name = name;
-        Columns = new List<IColumn>();
+        Columns = new List<Column>();
     }
 
     public void AddColumn(int id, string name)
     {
         if (Columns.Count < MAX)
         {
-            IColumn newColumn = new Column(id, name);
+            Column newColumn = new Column(id, name);
             Columns.Add(newColumn);
         }
     }
 
-    public void AddTask(ITask task)
+    public void AddColumn(Column column)
     {
-        IColumn column = Columns[0];
+        if (Columns.Count < MAX)
+        {
+            Columns.Add(column);
+            column.Board = this;
+        }
+    }
+
+    public void AddTask(Task task, Column col = null)
+    {
+        Column column;
+        if (col is null)
+            column = Columns[0];
+        else column = col;
         column.AddTask(task);
     }
 
-    public void MoveTask(IColumn columnOne, IColumn columnTwo, ITask task)
+    public void MoveTask(Column columnOne, Column columnTwo, Task task)
     {
         columnOne.DeleteTask(task);
         columnTwo.AddTask(task);

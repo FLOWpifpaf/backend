@@ -1,13 +1,16 @@
-﻿namespace ScrumBoardLibrary;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ScrumBoardLibrary;
 
 public interface IColumn
 {
-    public int Id { get; set; }
-    public string ColumnName { get; set; }
-    public void AddTask(ITask task);
-    public void DeleteTask(ITask task);
+    
+    [Key] public int Id { get; set; }
+    public string Name { get; set; }
+    public void AddTask(Task task);
+    public void DeleteTask(Task task);
     public void ChangeName(string name);
     public void Clear();
-    public ITask GetTask(string name);
-    public List<ITask> GetAllTasks();
+    public Task GetTask(string name);
+    public List<Task> GetAllTasks();
 }

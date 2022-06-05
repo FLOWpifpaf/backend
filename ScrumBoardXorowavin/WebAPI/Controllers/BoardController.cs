@@ -88,8 +88,10 @@ public class BoardController : Controller
     {
         try
         {
-            _columnService.CreateColumn(columnId, columnName);
-            _boardService.AddColumn(boardId,columnId,columnName);
+            _columnService.CreateColumn(boardId, columnId, columnName);
+            // _boardService.AddColumn(boardId,columnId,columnName);
+            // var z = _boardService.GetBoard(boardId).Columns;
+            
         }
         catch
         {
@@ -132,7 +134,7 @@ public class BoardController : Controller
     {
         try
         {
-            _taskService.CreateTask(boardId, taskId,taskName,taskDescription,priority);
+            _taskService.CreateTask(boardId, columnId,taskId,taskName,taskDescription,priority);
         }
         catch
         {

@@ -20,9 +20,9 @@ public class TaskService : ITaskService
         return tasksDto;
     }
 
-    public void CreateTask(int boardId, int id, string name, string desc, int prior)
+    public void CreateTask(int boardId, int columnId, int id, string name, string desc, int prior)
     {
-        this._repository.Create(boardId, id, name, desc, prior);
+        this._repository.Create(boardId,columnId, id, name, desc, prior);
     }
 
     public TaskDTO GetTask(int id)

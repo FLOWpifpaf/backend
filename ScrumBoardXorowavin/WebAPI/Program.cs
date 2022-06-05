@@ -1,7 +1,9 @@
 using BisnessLogicLayer.Interfaces;
 using BisnessLogicLayer.Services;
 using DataAccessLayer.Repositories;
+using Microsoft.EntityFrameworkCore;
 using ScrumBoardLibrary;
+using DbContext = DataAccessLayer.DbContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,8 @@ builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IColumnService, ColumnService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+
+builder.Services.AddDbContext<DbContext>();
 
 
 

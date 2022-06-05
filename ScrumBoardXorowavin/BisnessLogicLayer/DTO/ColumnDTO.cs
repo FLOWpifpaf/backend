@@ -12,7 +12,7 @@ public class ColumnDTO
     public ColumnDTO(IColumn column)
     {
         Id = column.Id;
-        Name = column.ColumnName;
+        Name = column.Name;
 
         Tasks = new List<ITask>(column.GetAllTasks());
     }

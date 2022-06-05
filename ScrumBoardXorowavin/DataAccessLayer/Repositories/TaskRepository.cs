@@ -6,62 +6,56 @@ namespace DataAccessLayer.Repositories;
 
 public class TaskRepository : ITaskRepository
 {
-    private readonly IMemoryCache _memoryCache;
+    private readonly DbContext _db;
     private readonly IBoardRepository _boardRepository;
+    private readonly IColumnRepository _columnRepository;
 
-    public TaskRepository(IMemoryCache memoryCache, IBoardRepository boardRepository)
+    public TaskRepository(DbContext db, IBoardRepository boardRepository, IColumnRepository columnRepository)
     {
-        _memoryCache = memoryCache;
+        _db = db;
         _boardRepository = boardRepository;
+        _columnRepository = columnRepository;
     }
 
-    public List<ITask> GetAllTasks()
+    public List<Task> GetAllTasks()
     {
-        _memoryCache.TryGetValue("tasks", out List<ITask> tasks);
+        var tasks = _db.Tasks.ToList();
         return tasks;
     }
 
-    public ITask Get(int id)
+    public Task Get(int id)
     {
         return GetAllTasks().Find(t => t.Id == id);
     }
 
-    public void Create(int boardId, int id, string name, string desc, int prior)
+    public void Create(int boardId,int columnId, int id, string name, string desc, int prior)
     {
-        var tasks = GetAllTasks();
-
-        if (tasks is null) tasks = new List<ITask>();
-
+        var tasks = _db.Tasks;
         var task = new Task(id, name, desc, prior);
-        tasks.Add(task);
 
         var board = _boardRepository.Get(boardId);
-        board.AddTask(task);
+        var col = _columnRepository.Get(columnId);
+        
+        board.AddTask(task,col);
+        tasks.Add(task);
 
-
-        _memoryCache.Set("tasks", tasks);
+        _db.SaveChanges();
     }
 
     public void Remove(int boardId, int id)
     {
-        var tasks = GetAllTasks();
-        for (int i = 0; i < tasks.Count; i++)
-            if (tasks[i].Id == id)
-            {
-                tasks.RemoveAt(i);
-                break;
-            }
+        var tasks = _db.Tasks;
+        var task = GetAllTasks().Find(t => t.Id == id);
+        tasks.Remove(task);
+
 
         foreach (var col in _boardRepository.Get(boardId).Columns)
         {
-            var task = col.GetAllTasks().Find(t => t.Id == id);
-            if (task is not null)
-                col.GetAllTasks().Remove(task);
+            if (col.Tasks.Contains(task))
+                col.Tasks.Remove(task);
         }
-        
-        
 
-        _memoryCache.Set("tasks", tasks);
+        _db.SaveChanges();
     }
 
     public void Update(int taskId, string? newName, string? newDesc, int? newPrior)
@@ -70,14 +64,17 @@ public class TaskRepository : ITaskRepository
         task.Name = newName ?? task.Name;
         task.Description = newDesc ?? task.Description;
         task.Priority = newPrior ?? task.Priority;
+        _db.SaveChanges();
     }
 
     public void Move(int boardId, int taskId, int colToId)
     {
         var task = Get(taskId);
-        Remove(boardId,taskId);
-        var col = _boardRepository.Get(boardId).Columns.Find(c => c.Id == colToId);
-        col.AddTask(task);
-        
+        Remove(boardId, taskId);
+        var col = _columnRepository.Get(colToId);
+        var board = _boardRepository.Get(boardId);
+        board.AddTask(task,col);
+        _db.Tasks.Add(task);
+        _db.SaveChanges();
     }
 }

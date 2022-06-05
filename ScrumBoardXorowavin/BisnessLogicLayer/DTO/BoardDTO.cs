@@ -8,7 +8,7 @@ public class BoardDTO
     public string Name { get; set; }
     public List<ColumnDTO> Columns { get; set; }
 
-    public BoardDTO(IBoard board)
+    public BoardDTO(Board board)
     {
         Id = board.Id;
         Name = board.Name;
